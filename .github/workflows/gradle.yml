@@ -21,9 +21,6 @@ jobs:
         with:
           java-version: 21
           distribution: 'zulu' # Alternative distribution options are available
-      - name: Setup AWS CLI
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
       - name: Configure AWS Credentials for audience
         uses: aws-actions/configure-aws-credentials@v4
         with:
