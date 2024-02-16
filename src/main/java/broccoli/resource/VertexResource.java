@@ -100,11 +100,7 @@ public class VertexResource {
   @Path("/{id}")
   @Transactional
   public Response deleteVertex(@PathParam("id") @NotBlank String id) {
-    final var vertex = vertexRepository.findById(id);
-    if (vertex == null) {
-      throw new NotFoundException();
-    }
-    vertexRepository.delete(vertex);
+    vertexRepository.findByIdOptional(id).ifPresent(vertexRepository::delete);
     return Response.noContent().build();
   }
 

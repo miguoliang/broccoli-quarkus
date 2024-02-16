@@ -29,6 +29,7 @@ public final class ResourceService {
    * @param name Vertex name
    * @param type Vertex type
    */
+  @Transactional
   public Vertex createVertex(String name, String type) throws NoSuchAlgorithmException {
     final var vertex = new Vertex();
     vertex.setName(name);

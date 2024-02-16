@@ -1,6 +1,8 @@
 package broccoli;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import broccoli.common.ResourceService;
 import io.quarkus.test.junit.QuarkusTest;
@@ -30,12 +32,14 @@ class VertexResourceDeletionTest {
   void shouldReturnNoContent_WhenVertexAlreadyExists(TestInfo testInfo)
       throws NoSuchAlgorithmException {
 
-    resourceService.createVertex(testInfo.getDisplayName(), "test");
+    final var vertex = resourceService.createVertex(testInfo.getDisplayName(), "test");
 
     given()
         .when()
-        .delete("/vertex/" + testInfo.getDisplayName())
+        .delete("/vertex/" + vertex.getId())
         .then()
         .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+
+    assertThat(resourceService.vertexExists(vertex.getName(), vertex.getType()), is(false));
   }
 }
