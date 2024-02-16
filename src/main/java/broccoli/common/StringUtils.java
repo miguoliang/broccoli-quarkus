@@ -5,6 +5,10 @@ package broccoli.common;
  */
 public class StringUtils {
 
+  private StringUtils() {
+
+  }
+
   public static String defaultString(String type) {
     return type == null ? "" : type;
   }

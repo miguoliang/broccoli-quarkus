@@ -21,23 +21,71 @@ public class VertexProperty {
   @Id
   @ManyToOne(optional = false)
   @JoinColumn(name = "vertex_id")
-  public Vertex vertex;
+  private Vertex vertex;
 
   @Id
   @Column(name = "scope", nullable = false)
-  public String scope = "default";
+  private String scope = "default";
 
   @Id
   @Column(name = "property_key", nullable = false)
-  public String key;
+  private String key;
 
   @Column(name = "property_value", nullable = false)
-  public String value = "";
+  private String value = "";
 
   @Embedded
-  public GeneralColumns generalColumns;
+  private GeneralColumns generalColumns;
 
   @Version
   @Column(name = "version", nullable = false)
-  public Integer version = 0;
+  private Integer version = 0;
+
+  public Vertex getVertex() {
+    return vertex;
+  }
+
+  public void setVertex(Vertex vertex) {
+    this.vertex = vertex;
+  }
+
+  public String getScope() {
+    return scope;
+  }
+
+  public void setScope(String scope) {
+    this.scope = scope;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
+
+  public GeneralColumns getGeneralColumns() {
+    return generalColumns;
+  }
+
+  public void setGeneralColumns(GeneralColumns generalColumns) {
+    this.generalColumns = generalColumns;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
 }

@@ -1,5 +1,7 @@
 package broccoli.dto.request;
 
+import broccoli.persistence.entity.Vertex;
+import broccoli.persistence.entity.VertexProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -8,4 +10,13 @@ import jakarta.validation.constraints.NotNull;
  */
 public record SetVertexPropertyRequest(@NotBlank String scope, @NotBlank String key,
                                        @NotNull String value) {
+
+  public VertexProperty toEntity(Vertex vertex) {
+    final var vertexProperty = new VertexProperty();
+    vertexProperty.setScope(scope);
+    vertexProperty.setKey(key);
+    vertexProperty.setValue(value);
+    vertexProperty.setVertex(vertex);
+    return vertexProperty;
+  }
 }

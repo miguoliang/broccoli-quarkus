@@ -11,12 +11,11 @@ import broccoli.persistence.entity.Vertex;
 import broccoli.persistence.repository.VertexRepository;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
@@ -37,20 +36,20 @@ class VertexResourceCreationTest {
     given()
         .when()
         .body(new CreateVertexRequest(name, type))
-        .contentType(ContentType.JSON)
+        .contentType(MediaType.APPLICATION_JSON)
         .post("/vertex")
         .then()
         .body("id", is(id))
-        .statusCode(HttpStatus.SC_CREATED);
+        .statusCode(Response.Status.CREATED.getStatusCode());
 
     final var vertex = vertexRepository.findById(id);
     assertThat(vertex, notNullValue());
-    assertThat(vertex.id, is(id));
-    assertThat(vertex.name, is(name));
-    assertThat(vertex.type, is(type));
-    assertThat(vertex.version, is(0));
-    assertThat(vertex.generalColumns.dateCreated, lessThanOrEqualTo(LocalDateTime.now()));
-    assertThat(vertex.generalColumns.dateUpdated, lessThanOrEqualTo(LocalDateTime.now()));
+    assertThat(vertex.getId(), is(id));
+    assertThat(vertex.getName(), is(name));
+    assertThat(vertex.getType(), is(type));
+    assertThat(vertex.getVersion(), is(0));
+    assertThat(vertex.getGeneralColumns().getDateCreated(), lessThanOrEqualTo(LocalDateTime.now()));
+    assertThat(vertex.getGeneralColumns().getDateUpdated(), lessThanOrEqualTo(LocalDateTime.now()));
   }
 
   @Test
@@ -61,15 +60,15 @@ class VertexResourceCreationTest {
     final var id = Vertex.getId(name, type);
 
     final var vertex = new Vertex();
-    vertex.id = id;
-    vertex.name = name;
-    vertex.type = type;
+    vertex.setId(id);
+    vertex.setName(name);
+    vertex.setType(type);
     QuarkusTransaction.requiringNew().run(() -> vertexRepository.persist(vertex));
 
     given()
         .when()
         .body(new CreateVertexRequest(name, type))
-        .contentType(ContentType.JSON)
+        .contentType(MediaType.APPLICATION_JSON)
         .post("/vertex")
         .then()
         .statusCode(Response.Status.CONFLICT.getStatusCode());
@@ -80,7 +79,7 @@ class VertexResourceCreationTest {
     given()
         .when()
         .body(new CreateVertexRequest(null, null))
-        .contentType(ContentType.JSON)
+        .contentType(MediaType.APPLICATION_JSON)
         .post("/vertex")
         .then()
         .statusCode(Response.Status.BAD_REQUEST.getStatusCode());

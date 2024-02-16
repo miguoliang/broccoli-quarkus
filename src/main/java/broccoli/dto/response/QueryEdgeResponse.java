@@ -15,10 +15,10 @@ public record QueryEdgeResponse(String inVertexId, String inVertexName, String i
    * @return {@link QueryEdgeResponse}
    */
   public static QueryEdgeResponse of(Edge edge) {
-    final var inVertex = edge.inVertex;
-    final var outVertex = edge.outVertex;
-    return new QueryEdgeResponse(inVertex.id, inVertex.name, inVertex.type,
-        outVertex.id, outVertex.name, outVertex.type, edge.name,
-        edge.scope);
+    final var inVertex = edge.getInVertex();
+    final var outVertex = edge.getOutVertex();
+    return new QueryEdgeResponse(inVertex.getId(), inVertex.getName(), inVertex.getType(),
+        outVertex.getId(), outVertex.getName(), outVertex.getType(), edge.getName(),
+        edge.getScope());
   }
 }

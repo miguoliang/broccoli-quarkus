@@ -10,6 +10,7 @@ import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
+import java.security.NoSuchAlgorithmException;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -21,22 +22,22 @@ class VertexResourceQueryTest {
   VertexRepository vertexRepository;
 
   @Test
-  void getById_ShouldReturnFound(TestInfo testInfo) {
+  void getById_ShouldReturnFound(TestInfo testInfo) throws NoSuchAlgorithmException {
 
     final var name = testInfo.getDisplayName();
     final var type = "type";
     final var vertex = new Vertex();
-    vertex.name = name;
-    vertex.type = type;
+    vertex.setName(name);
+    vertex.setType(type);
 
     QuarkusTransaction.requiringNew().run(() ->
         vertexRepository.persist(vertex));
 
     given()
-        .when().get("/vertex/" + vertex.id)
+        .when().get("/vertex/" + vertex.getId())
         .then()
         .statusCode(Response.Status.OK.getStatusCode())
-        .body("id", is(vertex.id))
+        .body("id", is(vertex.getId()))
         .body("name", is(name))
         .body("type", is(type));
   }
@@ -54,10 +55,14 @@ class VertexResourceQueryTest {
   void query_ShouldReturnFoundWithoutParameters(TestInfo testInfo) {
 
     QuarkusTransaction.requiringNew().run(() -> IntStream.range(0, 50).forEach(i -> {
-      final var vertex = new Vertex();
-      vertex.name = testInfo.getDisplayName() + i;
-      vertex.type = "type";
-      vertexRepository.persist(vertex);
+      try {
+        final var vertex = new Vertex();
+        vertex.setName(testInfo.getDisplayName() + i);
+        vertex.setType("type");
+        vertexRepository.persist(vertex);
+      } catch (Exception e) {
+        assert false;
+      }
     }));
 
     given()

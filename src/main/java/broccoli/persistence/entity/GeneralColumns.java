@@ -17,10 +17,26 @@ public class GeneralColumns {
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created")
-  public LocalDateTime dateCreated = LocalDateTime.now();
+  private LocalDateTime dateCreated = LocalDateTime.now();
 
   @UpdateTimestamp
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_updated")
-  public LocalDateTime dateUpdated = LocalDateTime.now();
+  private LocalDateTime dateUpdated = LocalDateTime.now();
+
+  public LocalDateTime getDateCreated() {
+    return dateCreated;
+  }
+
+  public void setDateCreated(LocalDateTime dateCreated) {
+    this.dateCreated = dateCreated;
+  }
+
+  public LocalDateTime getDateUpdated() {
+    return dateUpdated;
+  }
+
+  public void setDateUpdated(LocalDateTime dateUpdated) {
+    this.dateUpdated = dateUpdated;
+  }
 }

@@ -7,9 +7,33 @@ import java.io.Serializable;
  */
 public class VertexPropertyId implements Serializable {
 
-  public Vertex vertex;
-  public String scope;
-  public String key;
+  private Vertex vertex;
+  private String scope;
+  private String key;
+
+  public Vertex getVertex() {
+    return vertex;
+  }
+
+  public void setVertex(Vertex vertex) {
+    this.vertex = vertex;
+  }
+
+  public String getScope() {
+    return scope;
+  }
+
+  public void setScope(String scope) {
+    this.scope = scope;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
 
   @Override
   public boolean equals(Object o) {

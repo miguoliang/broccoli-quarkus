@@ -21,25 +21,73 @@ public class Edge {
   @Id
   @ManyToOne(optional = false)
   @JoinColumn(name = "in_vertex_id")
-  public Vertex inVertex;
+  private Vertex inVertex;
 
   @Id
   @ManyToOne(optional = false)
   @JoinColumn(name = "out_vertex_id")
-  public Vertex outVertex;
+  private Vertex outVertex;
 
   @Id
   @Column(name = "name", nullable = false)
-  public String name;
+  private String name;
 
   @Id
   @Column(name = "scope", nullable = false)
-  public String scope = "default";
+  private String scope = "default";
 
   @Embedded
-  public GeneralColumns generalColumns;
+  private GeneralColumns generalColumns;
 
   @Version
   @Column(name = "version", nullable = false)
-  public Integer version = 0;
+  private Integer version = 0;
+
+  public Vertex getInVertex() {
+    return inVertex;
+  }
+
+  public void setInVertex(Vertex inVertex) {
+    this.inVertex = inVertex;
+  }
+
+  public Vertex getOutVertex() {
+    return outVertex;
+  }
+
+  public void setOutVertex(Vertex outVertex) {
+    this.outVertex = outVertex;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getScope() {
+    return scope;
+  }
+
+  public void setScope(String scope) {
+    this.scope = scope;
+  }
+
+  public GeneralColumns getGeneralColumns() {
+    return generalColumns;
+  }
+
+  public void setGeneralColumns(GeneralColumns generalColumns) {
+    this.generalColumns = generalColumns;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
 }

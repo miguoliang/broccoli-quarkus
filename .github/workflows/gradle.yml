@@ -5,6 +5,9 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+permissions:
+  id-token: write
+  contents: read
 jobs:
   build:
     name: Build and analyze
@@ -18,9 +21,29 @@ jobs:
         with:
           java-version: 21
           distribution: 'zulu' # Alternative distribution options are available
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+      - name: Configure AWS Credentials for audience
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::072340891755:role/github-actions-broccoli-quarkus-Role-TAQDimZKBhLP
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 8.5
       - name: Build and analyze
         run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
+      - name: Deploy to AWS
+        run: |
+          # Constants
+          S3_BUCKET=lambda-layers-1684737774331
+          S3_KEY="demo-"$(date +%s)".zip"
+          LAMBDA_FUNCTION_NAME=demo
+          # Upload function.zip
+          aws s3 cp build/function.zip s3://$S3_BUCKET/$S3_KEY
+          # Update the Lambda function
+          aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --s3-bucket $S3_BUCKET --s3-key $S3_KEY
+

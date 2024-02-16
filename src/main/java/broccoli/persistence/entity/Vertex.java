@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,29 +22,29 @@ import java.util.Set;
 public class Vertex {
   @Id
   @Column(name = "id", nullable = false)
-  public String id;
+  private String id;
 
   @OneToMany(mappedBy = "inVertex", cascade = CascadeType.ALL, orphanRemoval = true)
-  public Set<Edge> outEdges = new LinkedHashSet<>();
+  private Set<Edge> outEdges = new LinkedHashSet<>();
 
   @OneToMany(mappedBy = "outVertex", cascade = CascadeType.ALL, orphanRemoval = true)
-  public Set<Edge> inEdges = new LinkedHashSet<>();
+  private Set<Edge> inEdges = new LinkedHashSet<>();
 
   @OneToMany(mappedBy = "vertex", cascade = CascadeType.ALL, orphanRemoval = true)
-  public Set<VertexProperty> properties = new LinkedHashSet<>();
+  private Set<VertexProperty> properties = new LinkedHashSet<>();
 
   @Column(name = "name", nullable = false)
-  public String name;
+  private String name;
 
   @Column(name = "type", nullable = false)
-  public String type;
+  private String type;
 
   @Embedded
-  public GeneralColumns generalColumns;
+  private GeneralColumns generalColumns;
 
   @Version
   @Column(name = "version", nullable = false)
-  public Integer version = 0;
+  private Integer version = 0;
 
   /**
    * Set vertex name.
@@ -79,31 +78,59 @@ public class Vertex {
         StringUtils.defaultString(type) + ":" + StringUtils.defaultString(name));
   }
 
-  /**
-   * Check if a property exists.
-   *
-   * @param scope scope
-   * @param key   key
-   * @return true if exists
-   */
-  public boolean hasProperty(String scope, String key) {
-    return properties.stream()
-        .anyMatch(p -> p.scope.equals(scope) && p.key.equals(key));
+  public String getId() {
+    return id;
   }
 
-  /**
-   * Get property values.
-   *
-   * @param scope scope
-   * @param key   key
-   * @return property values
-   */
-  public List<String> getProperty(String scope, String key) {
-    return properties.stream()
-        .filter(p -> p.scope.equals(scope) && p.key.equals(key))
-        .sorted((a, b) -> b.generalColumns.dateUpdated
-            .compareTo(a.generalColumns.dateUpdated))
-        .map(it -> it.value)
-        .toList();
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public Set<Edge> getOutEdges() {
+    return outEdges;
+  }
+
+  public void setOutEdges(Set<Edge> outEdges) {
+    this.outEdges = outEdges;
+  }
+
+  public Set<Edge> getInEdges() {
+    return inEdges;
+  }
+
+  public void setInEdges(Set<Edge> inEdges) {
+    this.inEdges = inEdges;
+  }
+
+  public Set<VertexProperty> getProperties() {
+    return properties;
+  }
+
+  public void setProperties(Set<VertexProperty> properties) {
+    this.properties = properties;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public GeneralColumns getGeneralColumns() {
+    return generalColumns;
+  }
+
+  public void setGeneralColumns(GeneralColumns generalColumns) {
+    this.generalColumns = generalColumns;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
   }
 }

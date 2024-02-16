@@ -3,8 +3,8 @@ package broccoli.resource;
 import broccoli.dto.response.Page;
 import broccoli.dto.response.QueryEdgeResponse;
 import broccoli.persistence.entity.Edge;
-import broccoli.persistence.entity.Vertex;
 import broccoli.persistence.repository.EdgeRepository;
+import broccoli.persistence.repository.VertexRepository;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -26,9 +27,12 @@ public class EdgeResource {
 
   private final EdgeRepository edgeRepository;
 
+  private final VertexRepository vertexRepository;
+
   @Inject
-  public EdgeResource(EdgeRepository edgeRepository) {
+  public EdgeResource(EdgeRepository edgeRepository, VertexRepository vertexRepository) {
     this.edgeRepository = edgeRepository;
+    this.vertexRepository = vertexRepository;
   }
 
   @GET
@@ -55,13 +59,17 @@ public class EdgeResource {
   @POST
   @Transactional
   public QueryEdgeResponse createEdge(QueryEdgeResponse request) {
+
+    final var inVertex = vertexRepository.findByIdOptional(request.inVertexId())
+        .orElseThrow(() -> new NotFoundException("Incoming vertex not found"));
+    final var outVertex = vertexRepository.findByIdOptional(request.outVertexId())
+        .orElseThrow(() -> new NotFoundException("Outgoing vertex not found"));
+
     final var edge = new Edge();
-    edge.inVertex = new Vertex();
-    edge.inVertex.id = request.inVertexId();
-    edge.outVertex = new Vertex();
-    edge.outVertex.id = request.outVertexId();
-    edge.name = request.name();
-    edge.scope = request.scope();
+    edge.setInVertex(inVertex);
+    edge.setOutVertex(outVertex);
+    edge.setName(request.name());
+    edge.setScope(request.scope());
     edgeRepository.persist(edge);
     return QueryEdgeResponse.of(edge);
   }

@@ -12,6 +12,6 @@ import broccoli.persistence.entity.Vertex;
 public record CreateVertexResponse(String id, String name, String type) {
 
   public static CreateVertexResponse of(Vertex vertex) {
-    return new CreateVertexResponse(vertex.id, vertex.name, vertex.type);
+    return new CreateVertexResponse(vertex.getId(), vertex.getName(), vertex.getType());
   }
 }

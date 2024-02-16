@@ -17,10 +17,10 @@ public record CreateEdgeResponse(String inVertexId, String inVertexName, String 
    * @return {@link CreateEdgeResponse}
    */
   public static CreateEdgeResponse of(Edge edge) {
-    final var inVertex = edge.inVertex;
-    final var outVertex = edge.outVertex;
-    return new CreateEdgeResponse(inVertex.id, inVertex.name, inVertex.type,
-        outVertex.id, outVertex.name, outVertex.type, edge.name,
-        edge.scope);
+    final var inVertex = edge.getInVertex();
+    final var outVertex = edge.getOutVertex();
+    return new CreateEdgeResponse(inVertex.getId(), inVertex.getName(), inVertex.getType(),
+        outVertex.getId(), outVertex.getName(), outVertex.getType(), edge.getName(),
+        edge.getScope());
   }
 }
