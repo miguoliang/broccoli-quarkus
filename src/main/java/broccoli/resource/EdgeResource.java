@@ -1,16 +1,16 @@
 package broccoli.resource;
 
 import broccoli.common.Page;
+import broccoli.common.Pageable;
 import broccoli.dto.request.CreateEdgeRequest;
 import broccoli.dto.response.QueryEdgeResponse;
 import broccoli.persistence.entity.Edge;
 import broccoli.persistence.repository.EdgeRepository;
 import broccoli.persistence.repository.VertexRepository;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -49,11 +49,10 @@ public class EdgeResource {
   /**
    * Search edges.
    *
-   * @param vid        vertex id collection
-   * @param name       edge name
-   * @param scope      edge scope
-   * @param pageNumber page number
-   * @param pageSize   page size
+   * @param vid      vertex id collection
+   * @param name     edge name
+   * @param scope    edge scope
+   * @param pageable page
    * @return page of edges
    */
   @GET
@@ -61,19 +60,17 @@ public class EdgeResource {
   public Page<QueryEdgeResponse> searchEdges(@QueryParam("vid") @NotEmpty Set<String> vid,
                                              @QueryParam("name") @NotEmpty Set<String> name,
                                              @QueryParam("scope") @NotEmpty Set<String> scope,
-                                             @QueryParam("page") @Nullable Integer pageNumber,
-                                             @QueryParam("size") @Nullable Integer pageSize) {
-    final var index = pageNumber == null ? 0 : pageNumber;
-    final var size = pageSize == null ? 20 : pageSize;
+                                             @BeanParam Pageable pageable) {
+    final var index = pageable.getPage();
+    final var size = pageable.getSize();
+    final var query = "name in ?2 and scope in ?3 and inVertex.id in ?1 or outVertex.id in ?1";
     final var content = edgeRepository
-        .find("inVertex.id in ?1 and name in ?2 and scope in ?3", vid, name, scope)
+        .find(query, vid, name, scope)
         .page(index, size)
         .stream()
         .map(QueryEdgeResponse::of)
         .toList();
-    final var count =
-        PanacheEntityBase.count("inVertex.id in ?1 and name in ?2 and scope in ?3", vid, name,
-            scope);
+    final var count = edgeRepository.count(query, vid, name, scope);
     return new Page<>(content, index, size, count);
   }
 

@@ -1,6 +1,7 @@
 package broccoli.resource;
 
 import broccoli.common.Page;
+import broccoli.common.Pageable;
 import broccoli.common.StringUtils;
 import broccoli.dto.request.CreateVertexRequest;
 import broccoli.dto.request.SetVertexPropertyRequest;
@@ -13,6 +14,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -90,17 +92,15 @@ public class VertexResource {
   /**
    * Search vertices.
    *
-   * @param q          query
-   * @param pageNumber page number
-   * @param pageSize   page size
+   * @param q        query
+   * @param pageable pageable
    * @return response
    */
   @GET
   public Page<QueryVertexResponse> searchVertices(@QueryParam("q") String q,
-                                                  @QueryParam("page") Integer pageNumber,
-                                                  @QueryParam("size") Integer pageSize) {
-    final var index = pageNumber == null ? 0 : pageNumber;
-    final var size = pageSize == null ? 20 : pageSize;
+                                                  @BeanParam Pageable pageable) {
+    final var index = pageable.getPage();
+    final var size = pageable.getSize();
 
     if (StringUtils.isBlank(q)) {
       final var content = vertexRepository

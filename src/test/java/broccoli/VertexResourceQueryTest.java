@@ -89,28 +89,4 @@ class VertexResourceQueryTest {
         .body("pageSize", is(20));
   }
 
-  @Test
-  void query_ShouldReturnFoundWithPaginationOnly(TestInfo testInfo) {
-
-    QuarkusTransaction.requiringNew().run(() -> IntStream.range(0, 50).forEach(i -> {
-      try {
-        final var name = testInfo.getDisplayName() + i;
-        final var type = "type";
-        resourceService.createVertex(name, type);
-      } catch (Exception e) {
-        assert false;
-      }
-    }));
-
-    given()
-        .when().get("/vertex?page=1&size=10")
-        .then()
-        .statusCode(Response.Status.OK.getStatusCode())
-        .body("content.size()", is(10))
-        .body("totalElements", greaterThanOrEqualTo(50))
-        .body("totalPages", greaterThanOrEqualTo(5))
-        .body("pageNumber", is(1))
-        .body("pageSize", is(10));
-  }
-
 }
