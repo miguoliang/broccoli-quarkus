@@ -10,6 +10,9 @@ import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * The {@link ResourceService}.
+ */
 @Singleton
 public final class ResourceService {
 

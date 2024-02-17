@@ -5,12 +5,16 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * The {@link GeneralColumns} entity.
  */
+@Setter
+@Getter
 @Embeddable
 public class GeneralColumns {
 
@@ -24,19 +28,4 @@ public class GeneralColumns {
   @Column(name = "date_updated")
   private LocalDateTime dateUpdated = LocalDateTime.now();
 
-  public LocalDateTime getDateCreated() {
-    return dateCreated;
-  }
-
-  public void setDateCreated(LocalDateTime dateCreated) {
-    this.dateCreated = dateCreated;
-  }
-
-  public LocalDateTime getDateUpdated() {
-    return dateUpdated;
-  }
-
-  public void setDateUpdated(LocalDateTime dateUpdated) {
-    this.dateUpdated = dateUpdated;
-  }
 }

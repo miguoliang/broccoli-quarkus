@@ -38,7 +38,7 @@ class VertexResourcePropertyCreationTest {
         .when()
         .body(new SetVertexPropertyRequest(scope, key, "value"))
         .contentType(MediaType.APPLICATION_JSON)
-        .put("/vertex/" + id + "/property")
+        .post("/vertex/" + id + "/property")
         .then()
         .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 

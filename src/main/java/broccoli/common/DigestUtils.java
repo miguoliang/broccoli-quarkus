@@ -11,6 +11,13 @@ public class DigestUtils {
   private DigestUtils() {
   }
 
+  /**
+   * Returns the SHA-512 hash of the input string.
+   *
+   * @param input input
+   * @return SHA-512 hash
+   * @throws NoSuchAlgorithmException if the algorithm is not available
+   */
   public static String sha512Hex(String input) throws NoSuchAlgorithmException {
     MessageDigest md = MessageDigest.getInstance("SHA-512");
     byte[] bytes = md.digest(input.getBytes());

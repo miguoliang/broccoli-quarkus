@@ -9,10 +9,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The {@link Edge} entity.
  */
+@Setter
+@Getter
 @Entity
 @Table(name = "edge")
 @IdClass(EdgeId.class)
@@ -43,51 +47,4 @@ public class Edge {
   @Column(name = "version", nullable = false)
   private Integer version = 0;
 
-  public Vertex getInVertex() {
-    return inVertex;
-  }
-
-  public void setInVertex(Vertex inVertex) {
-    this.inVertex = inVertex;
-  }
-
-  public Vertex getOutVertex() {
-    return outVertex;
-  }
-
-  public void setOutVertex(Vertex outVertex) {
-    this.outVertex = outVertex;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getScope() {
-    return scope;
-  }
-
-  public void setScope(String scope) {
-    this.scope = scope;
-  }
-
-  public GeneralColumns getGeneralColumns() {
-    return generalColumns;
-  }
-
-  public void setGeneralColumns(GeneralColumns generalColumns) {
-    this.generalColumns = generalColumns;
-  }
-
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
 }

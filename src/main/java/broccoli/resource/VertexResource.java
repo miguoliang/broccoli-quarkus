@@ -1,11 +1,11 @@
 package broccoli.resource;
 
+import broccoli.common.Page;
 import broccoli.common.StringUtils;
 import broccoli.dto.request.CreateVertexRequest;
 import broccoli.dto.request.SetVertexPropertyRequest;
 import broccoli.dto.response.CreateVertexResponse;
 import broccoli.dto.response.GetVertexResponse;
-import broccoli.dto.response.Page;
 import broccoli.dto.response.QueryVertexResponse;
 import broccoli.persistence.repository.VertexPropertyRepository;
 import broccoli.persistence.repository.VertexRepository;
@@ -18,7 +18,6 @@ import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -28,6 +27,9 @@ import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Vertex resource endpoints.
+ */
 @Path("/vertex")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -37,6 +39,12 @@ public class VertexResource {
 
   private final VertexPropertyRepository vertexPropertyRepository;
 
+  /**
+   * Bean constructor.
+   *
+   * @param vertexRepository         vertex repository
+   * @param vertexPropertyRepository vertex property repository
+   */
   @Inject
   public VertexResource(VertexRepository vertexRepository,
                         VertexPropertyRepository vertexPropertyRepository) {
@@ -44,6 +52,13 @@ public class VertexResource {
     this.vertexPropertyRepository = vertexPropertyRepository;
   }
 
+  /**
+   * Create a vertex.
+   *
+   * @param request create vertex request
+   * @return response
+   * @throws NoSuchAlgorithmException no such algorithm exception
+   */
   @POST
   @Transactional
   public Response createVertex(@Valid CreateVertexRequest request) throws NoSuchAlgorithmException {
@@ -56,6 +71,12 @@ public class VertexResource {
         .entity(CreateVertexResponse.of(vertex)).build();
   }
 
+  /**
+   * Get a vertex by id.
+   *
+   * @param id vertex id
+   * @return response
+   */
   @GET
   @Path("/{id}")
   public GetVertexResponse getVertex(@PathParam("id") @NotBlank String id) {
@@ -66,6 +87,14 @@ public class VertexResource {
     return GetVertexResponse.of(vertex);
   }
 
+  /**
+   * Search vertices.
+   *
+   * @param q          query
+   * @param pageNumber page number
+   * @param pageSize   page size
+   * @return response
+   */
   @GET
   public Page<QueryVertexResponse> searchVertices(@QueryParam("q") String q,
                                                   @QueryParam("page") Integer pageNumber,
@@ -96,6 +125,12 @@ public class VertexResource {
     return new Page<>(content, index, size, count);
   }
 
+  /**
+   * Delete a vertex by id.
+   *
+   * @param id vertex id
+   * @return response
+   */
   @DELETE
   @Path("/{id}")
   @Transactional
@@ -104,7 +139,14 @@ public class VertexResource {
     return Response.noContent().build();
   }
 
-  @PUT
+  /**
+   * Set a property to a vertex.
+   *
+   * @param id      vertex id
+   * @param request set vertex property request
+   * @return response
+   */
+  @POST
   @Path("/{id}/property")
   @Transactional
   public Response setProperty(@PathParam("id") @NotBlank String id,

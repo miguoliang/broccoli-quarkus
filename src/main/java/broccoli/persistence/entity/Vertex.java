@@ -13,10 +13,14 @@ import jakarta.persistence.Version;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The {@link Vertex} entity.
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "vertex")
 public class Vertex {
@@ -47,6 +51,18 @@ public class Vertex {
   private Integer version = 0;
 
   /**
+   * Calculate vertex id.
+   *
+   * @param name Vertex name
+   * @param type Vertex type
+   * @return Vertex id
+   */
+  public static String getId(String name, String type) throws NoSuchAlgorithmException {
+    return DigestUtils.sha512Hex(
+        StringUtils.defaultString(type) + ":" + StringUtils.defaultString(name));
+  }
+
+  /**
    * Set vertex name.
    *
    * @param name Vertex name
@@ -67,73 +83,12 @@ public class Vertex {
   }
 
   /**
-   * Calculate vertex id.
+   * Get property.
    *
-   * @param name Vertex name
-   * @param type Vertex type
-   * @return Vertex id
+   * @param scope scope
+   * @param key   key
+   * @return the value of the property
    */
-  public static String getId(String name, String type) throws NoSuchAlgorithmException {
-    return DigestUtils.sha512Hex(
-        StringUtils.defaultString(type) + ":" + StringUtils.defaultString(name));
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public Set<Edge> getOutEdges() {
-    return outEdges;
-  }
-
-  public void setOutEdges(Set<Edge> outEdges) {
-    this.outEdges = outEdges;
-  }
-
-  public Set<Edge> getInEdges() {
-    return inEdges;
-  }
-
-  public void setInEdges(Set<Edge> inEdges) {
-    this.inEdges = inEdges;
-  }
-
-  public Set<VertexProperty> getProperties() {
-    return properties;
-  }
-
-  public void setProperties(Set<VertexProperty> properties) {
-    this.properties = properties;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public GeneralColumns getGeneralColumns() {
-    return generalColumns;
-  }
-
-  public void setGeneralColumns(GeneralColumns generalColumns) {
-    this.generalColumns = generalColumns;
-  }
-
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
-
   public String getProperty(String scope, String key) {
     return properties.stream()
         .filter(property -> property.getScope().equals(scope) && property.getKey().equals(key))
