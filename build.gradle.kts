@@ -2,7 +2,6 @@ plugins {
     java
     id("io.quarkus")
     id("checkstyle")
-    id("jacoco")
     id("org.sonarqube") version "4.4.1.3373"
 }
 
@@ -24,6 +23,7 @@ dependencies {
     implementation("io.quarkus:quarkus-resteasy-reactive")
     implementation("io.quarkus:quarkus-hibernate-orm-panache")
     implementation("io.quarkus:quarkus-jdbc-h2")
+    testImplementation("io.quarkus:quarkus-jacoco")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }
@@ -38,7 +38,6 @@ java {
 
 tasks.withType<Test> {
     systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
-    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.withType<JavaCompile> {
@@ -46,24 +45,9 @@ tasks.withType<JavaCompile> {
     options.compilerArgs.add("-parameters")
 }
 
-
-tasks.jacocoTestReport {
-
-    reports {
-        xml.required = true
-    }
-
-    // tests are required to run before generating the report
-    dependsOn(tasks.test)
-}
-
 extensions.getByType(CheckstyleExtension::class.java).apply {
     toolVersion = "10.12.5"
     enableExternalDtdLoad = true
-}
-
-jacoco {
-    toolVersion = "0.8.9"
 }
 
 sonar {

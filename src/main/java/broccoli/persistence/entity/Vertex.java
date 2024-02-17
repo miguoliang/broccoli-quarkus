@@ -133,4 +133,12 @@ public class Vertex {
   public void setVersion(Integer version) {
     this.version = version;
   }
+
+  public String getProperty(String scope, String key) {
+    return properties.stream()
+        .filter(property -> property.getScope().equals(scope) && property.getKey().equals(key))
+        .map(VertexProperty::getValue)
+        .findFirst()
+        .orElse(null);
+  }
 }
