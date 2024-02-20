@@ -4,7 +4,11 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
+import broccoli.common.ResourceTest;
+import broccoli.resource.VertexResource;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
@@ -13,17 +17,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
-class VertexResourceDeletionTest {
+@TestHTTPEndpoint(VertexResource.class)
+class VertexResourceDeletionTest extends ResourceTest {
 
   @Inject
-  ResourceService resourceService;
+  JvmResourceService resourceService;
 
   @Test
   void shouldReturnNoContent_WhenVertexDoesNotExist(TestInfo testInfo) {
 
     given()
         .when()
-        .delete("/vertex/" + testInfo.getDisplayName())
+        .delete("/" + testInfo.getDisplayName())
         .then()
         .statusCode(Response.Status.NO_CONTENT.getStatusCode());
   }
@@ -32,14 +37,19 @@ class VertexResourceDeletionTest {
   void shouldReturnNoContent_WhenVertexAlreadyExists(TestInfo testInfo)
       throws NoSuchAlgorithmException {
 
-    final var vertex = resourceService.createVertex(testInfo.getDisplayName(), "test");
+    final var vertex = getResourceService().createVertex(testInfo.getDisplayName(), "test");
 
     given()
         .when()
-        .delete("/vertex/" + vertex.getId())
+        .delete("/" + vertex.getId())
         .then()
         .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
-    assertThat(resourceService.vertexExists(vertex.getName(), vertex.getType()), is(false));
+    assertThat(getResourceService().vertexExists(vertex.getName(), vertex.getType()), is(false));
+  }
+
+  @Override
+  protected ResourceService getResourceService() {
+    return resourceService;
   }
 }

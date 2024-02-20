@@ -150,7 +150,7 @@ public class VertexResource {
   @Path("/{id}/property")
   @Transactional
   public Response setProperty(@PathParam("id") @NotBlank String id,
-                              SetVertexPropertyRequest request) {
+                              @Valid SetVertexPropertyRequest request) {
     final var vertex =
         vertexRepository.findByIdOptional(id).orElseThrow(NotFoundException::new);
     vertexPropertyRepository.persist(request.toEntity(vertex));

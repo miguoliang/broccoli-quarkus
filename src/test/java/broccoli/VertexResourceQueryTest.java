@@ -4,9 +4,13 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 
+import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
+import broccoli.common.ResourceTest;
 import broccoli.persistence.entity.Vertex;
+import broccoli.resource.VertexResource;
 import io.quarkus.narayana.jta.QuarkusTransaction;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
@@ -16,10 +20,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
-class VertexResourceQueryTest {
+@TestHTTPEndpoint(VertexResource.class)
+class VertexResourceQueryTest extends ResourceTest {
 
   @Inject
-  ResourceService resourceService;
+  JvmResourceService resourceService;
 
   @Test
   void getById_ShouldReturnFound(TestInfo testInfo) throws NoSuchAlgorithmException {
@@ -27,10 +32,10 @@ class VertexResourceQueryTest {
     final var name = testInfo.getDisplayName();
     final var type = "type";
     final var id = Vertex.getId(name, type);
-    resourceService.createVertex(name, type);
+    getResourceService().createVertex(name, type);
 
     given()
-        .when().get("/vertex/" + id)
+        .when().get("/" + id)
         .then()
         .statusCode(Response.Status.OK.getStatusCode())
         .body("id", is(id))
@@ -54,14 +59,15 @@ class VertexResourceQueryTest {
       try {
         final var name = testInfo.getDisplayName() + i;
         final var type = "type";
-        resourceService.createVertex(name, type);
+        getResourceService().createVertex(name, type);
       } catch (Exception e) {
         assert false;
       }
     }));
 
     given()
-        .when().get("/vertex")
+        .when()
+        .get()
         .then()
         .statusCode(Response.Status.OK.getStatusCode())
         .body("content.size()", is(20))
@@ -76,10 +82,10 @@ class VertexResourceQueryTest {
 
     final var name = testInfo.getDisplayName();
     final var type = "type";
-    resourceService.createVertex(name, type);
+    getResourceService().createVertex(name, type);
 
     given()
-        .when().get("/vertex?q=" + name)
+        .when().get("?q=" + name)
         .then()
         .statusCode(Response.Status.OK.getStatusCode())
         .body("content.size()", is(1))
@@ -89,4 +95,8 @@ class VertexResourceQueryTest {
         .body("pageSize", is(20));
   }
 
+  @Override
+  protected ResourceService getResourceService() {
+    return resourceService;
+  }
 }

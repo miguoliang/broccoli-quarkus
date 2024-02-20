@@ -4,9 +4,13 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
+import broccoli.common.ResourceTest;
 import broccoli.dto.request.SetVertexPropertyRequest;
 import broccoli.persistence.entity.Vertex;
+import broccoli.resource.VertexResource;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
@@ -16,10 +20,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
-class VertexResourcePropertyCreationTest {
+@TestHTTPEndpoint(VertexResource.class)
+class VertexResourcePropertyCreationTest extends ResourceTest {
 
   @Inject
-  ResourceService resourceService;
+  JvmResourceService resourceService;
 
   @Test
   void shouldSavePropertyValue_IfPropertyDoesNotExist(TestInfo testInfo)
@@ -28,7 +33,7 @@ class VertexResourcePropertyCreationTest {
     final var name = testInfo.getDisplayName();
     final var type = "test";
     final var id = Vertex.getId(name, type);
-    resourceService.createVertex(name, type);
+    getResourceService().createVertex(name, type);
 
     final var scope = "default";
     final var key = "key";
@@ -38,11 +43,16 @@ class VertexResourcePropertyCreationTest {
         .when()
         .body(new SetVertexPropertyRequest(scope, key, "value"))
         .contentType(MediaType.APPLICATION_JSON)
-        .post("/vertex/" + id + "/property")
+        .post("/" + id + "/property")
         .then()
         .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
-    final var vertex = resourceService.getVertex(name, type);
+    final var vertex = getResourceService().getVertex(name, type);
     assertThat(vertex.getProperty(scope, key), equalTo(value));
+  }
+
+  @Override
+  protected ResourceService getResourceService() {
+    return resourceService;
   }
 }
