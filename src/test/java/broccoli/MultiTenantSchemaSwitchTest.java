@@ -67,9 +67,8 @@ public class MultiTenantSchemaSwitchTest {
   private Vertex getVertex(final String tenantId, final String id)
       throws SQLException, NoSuchAlgorithmException {
 
-    final var schemaName = "schema_" + tenantId;
     final var connection = defaultDataSource.getConnection();
-    connection.setSchema(schemaName);
+    connection.setSchema(tenantId);
     final var resultSet = connection.createStatement()
         .executeQuery("SELECT * FROM vertex WHERE id = '%s'".formatted(id));
     resultSet.next();
@@ -83,9 +82,8 @@ public class MultiTenantSchemaSwitchTest {
 
   private int getVertexCount(final String tenantId) throws SQLException {
 
-    final var schemaName = "schema_" + tenantId;
     final var connection = defaultDataSource.getConnection();
-    connection.setSchema(schemaName);
+    connection.setSchema(tenantId);
     final var resultSet = connection.createStatement()
         .executeQuery("SELECT COUNT(*) FROM vertex");
     resultSet.next();

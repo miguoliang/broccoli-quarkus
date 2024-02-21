@@ -2,7 +2,6 @@ package broccoli.persistence;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 
@@ -18,10 +17,9 @@ public class MultiTenantSchemaService {
 
   public void createSchema(String tenantId) {
 
-    final var schemaName = "schema_" + tenantId;
     final var flyway = Flyway.configure()
         .dataSource(defaultDataSource)
-        .schemas(schemaName)
+        .schemas(tenantId)
         .load();
     flyway.migrate();
   }

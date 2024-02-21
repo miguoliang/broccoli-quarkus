@@ -25,7 +25,7 @@ public class MultiTenantSchemaServiceTest {
     multiTenantSchemaService.createSchema("test");
     final var connection = defaultDataSource.getConnection();
     final String query = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '%s'"
-        .formatted("schema_test");
+        .formatted("test");
     final var preparedStatement = connection.prepareStatement(query);
     final var resultSet = preparedStatement.executeQuery();
     resultSet.next();

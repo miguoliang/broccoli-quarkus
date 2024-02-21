@@ -10,25 +10,40 @@ import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
 import broccoli.common.ResourceTest;
 import broccoli.dto.request.CreateVertexRequest;
+import broccoli.persistence.MultiTenantSchemaService;
 import broccoli.persistence.entity.Vertex;
 import broccoli.resource.VertexResource;
 import io.quarkus.narayana.jta.QuarkusTransaction;
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
+import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import javax.sql.DataSource;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
 @TestHTTPEndpoint(VertexResource.class)
+@QuarkusTestResource(H2DatabaseTestResource.class)
 class VertexResourceCreationTest extends ResourceTest {
 
   @Inject
+  MultiTenantSchemaService multiTenantSchemaService;
+
+  @Inject
   JvmResourceService resourceService;
+
+  @BeforeEach
+  void setUp() {
+    multiTenantSchemaService.createSchema("default");
+  }
 
   @Test
   void shouldReturnCreated_WhenVertexDoesNotExist(TestInfo testInfo)
@@ -44,8 +59,8 @@ class VertexResourceCreationTest extends ResourceTest {
         .contentType(MediaType.APPLICATION_JSON)
         .post()
         .then()
-        .body("id", is(id))
-        .statusCode(Response.Status.CREATED.getStatusCode());
+        .statusCode(Response.Status.CREATED.getStatusCode())
+        .body("id", is(id));
 
     final var vertex = getResourceService().getVertex(name, type);
     assertThat(vertex, notNullValue());
