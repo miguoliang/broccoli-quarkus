@@ -1,5 +1,6 @@
 package broccoli.persistence;
 
+import broccoli.common.StringUtils;
 import io.quarkus.hibernate.orm.runtime.tenant.TenantResolver;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -30,6 +31,6 @@ public class MultiTenantResolver implements TenantResolver {
 
     final var tenantId = routingContext.request().getHeader("X-Tenant-Id");
     log.info("Tenant id: {}, path: {}", tenantId, routingContext.request().path());
-    return tenantId != null ? tenantId : getDefaultTenantId();
+    return "schema_%s".formatted(StringUtils.isBlank(tenantId) ? getDefaultTenantId() : tenantId);
   }
 }

@@ -1,36 +1,28 @@
 package broccoli.persistence;
 
-import broccoli.common.StringUtils;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 
 @ApplicationScoped
 public class MultiTenantSchemaService {
 
-  public DatabaseConnectionInfo createSchema(String tenantId) {
+  private final DataSource defaultDataSource;
+
+  @Inject
+  public MultiTenantSchemaService(DataSource defaultDataSource) {
+    this.defaultDataSource = defaultDataSource;
+  }
+
+  public void createSchema(String tenantId) {
 
     final var schemaName = "schema_" + tenantId;
-    final var jdbcUrl = "jdbc:postgresql://localhost:5432/mydb";
-    final var username = "myuser";
-    final var password = "mypassword";
-//    final var username = generateUsername();
-//    final var password = generatePassword();
     final var flyway = Flyway.configure()
-        .dataSource(jdbcUrl, username, password)
+        .dataSource(defaultDataSource)
         .schemas(schemaName)
         .load();
     flyway.migrate();
-    return new DatabaseConnectionInfo(jdbcUrl, username, password);
-  }
-
-  public record DatabaseConnectionInfo(String url, String username, String password) {
-  }
-
-  private static String generateUsername() {
-    return "user_" + StringUtils.generateRandomString(8);
-  }
-
-  private static String generatePassword() {
-    return StringUtils.generateRandomString(8) + "!0A";
   }
 }
