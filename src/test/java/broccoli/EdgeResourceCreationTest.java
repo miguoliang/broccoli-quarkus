@@ -3,10 +3,9 @@ package broccoli;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
-import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
-import broccoli.common.ResourceTest;
 import broccoli.dto.request.CreateEdgeRequest;
+import broccoli.persistence.MultiTenantSchemaService;
 import broccoli.resource.EdgeResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -14,24 +13,33 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
 @TestHTTPEndpoint(EdgeResource.class)
-class EdgeResourceCreationTest extends ResourceTest {
+class EdgeResourceCreationTest {
 
   @Inject
-  JvmResourceService resourceService;
+  ResourceService resourceService;
+
+  @Inject
+  MultiTenantSchemaService multiTenantSchemaService;
+
+  @BeforeEach
+  void setUp() {
+    multiTenantSchemaService.createSchema("default");
+  }
 
   @Test
   void shouldReturnCreated_WhenEdgeDoesNotExists(TestInfo testInfo)
       throws NoSuchAlgorithmException {
 
     final var inVertex =
-        getResourceService().createVertex(testInfo.getDisplayName() + "in", "test");
+        resourceService.createVertex(testInfo.getDisplayName() + "in", "test");
     final var outVertex =
-        getResourceService().createVertex(testInfo.getDisplayName() + "out", "test");
+        resourceService.createVertex(testInfo.getDisplayName() + "out", "test");
     final var name = "associated";
     final var scope = "default";
     final var request = new CreateEdgeRequest(inVertex.getId(), outVertex.getId(), name, scope);
@@ -50,12 +58,12 @@ class EdgeResourceCreationTest extends ResourceTest {
       throws NoSuchAlgorithmException {
 
     final var inVertex =
-        getResourceService().createVertex(testInfo.getDisplayName() + "in", "test");
+        resourceService.createVertex(testInfo.getDisplayName() + "in", "test");
     final var outVertex =
-        getResourceService().createVertex(testInfo.getDisplayName() + "out", "test");
+        resourceService.createVertex(testInfo.getDisplayName() + "out", "test");
     final var name = "associated";
     final var scope = "default";
-    getResourceService().createEdge(inVertex.getId(), outVertex.getId(), name, scope);
+    resourceService.createEdge(inVertex.getId(), outVertex.getId(), name, scope);
     final var request = new CreateEdgeRequest(inVertex.getId(), outVertex.getId(), name, scope);
 
     given()
@@ -72,9 +80,9 @@ class EdgeResourceCreationTest extends ResourceTest {
       throws NoSuchAlgorithmException {
 
     final var inVertex =
-        getResourceService().createVertex(testInfo.getDisplayName() + "in", "test");
+        resourceService.createVertex(testInfo.getDisplayName() + "in", "test");
     final var outVertex =
-        getResourceService().createVertex(testInfo.getDisplayName() + "out", "test");
+        resourceService.createVertex(testInfo.getDisplayName() + "out", "test");
     final var name = "associated";
     final var scope = "default";
     final var fakeId = "fakeId";
@@ -98,10 +106,5 @@ class EdgeResourceCreationTest extends ResourceTest {
         .statusCode(Response.Status.NOT_FOUND.getStatusCode())
         .body("errors.size()", is(1))
         .body("errors[0].message", is("Outgoing vertex not found"));
-  }
-
-  @Override
-  protected ResourceService getResourceService() {
-    return resourceService;
   }
 }

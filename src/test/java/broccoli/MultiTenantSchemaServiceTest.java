@@ -10,8 +10,11 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Test for {@link MultiTenantSchemaService}.
+ */
 @QuarkusTest
-public class MultiTenantSchemaServiceTest {
+class MultiTenantSchemaServiceTest {
 
   @Inject
   MultiTenantSchemaService multiTenantSchemaService;

@@ -2,11 +2,10 @@ package broccoli;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
-import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
-import broccoli.common.ResourceTest;
 import broccoli.dto.request.SetVertexPropertyRequest;
 import broccoli.persistence.entity.Vertex;
 import broccoli.resource.VertexResource;
@@ -21,10 +20,10 @@ import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
 @TestHTTPEndpoint(VertexResource.class)
-class VertexResourcePropertyCreationTest extends ResourceTest {
+class VertexResourcePropertyCreationTest {
 
   @Inject
-  JvmResourceService resourceService;
+  ResourceService resourceService;
 
   @Test
   void shouldSavePropertyValue_IfPropertyDoesNotExist(TestInfo testInfo)
@@ -33,7 +32,7 @@ class VertexResourcePropertyCreationTest extends ResourceTest {
     final var name = testInfo.getDisplayName();
     final var type = "test";
     final var id = Vertex.getId(name, type);
-    getResourceService().createVertex(name, type);
+    resourceService.createVertex(name, type);
 
     final var scope = "default";
     final var key = "key";
@@ -47,12 +46,11 @@ class VertexResourcePropertyCreationTest extends ResourceTest {
         .then()
         .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
-    final var vertex = getResourceService().getVertex(name, type);
-    assertThat(vertex.getProperty(scope, key), equalTo(value));
-  }
-
-  @Override
-  protected ResourceService getResourceService() {
-    return resourceService;
+    final var property = resourceService.getVertexProperty(id, scope, key);
+    assertThat(property, notNullValue());
+    assertThat(property.vertexId(), is(id));
+    assertThat(property.key(), is(key));
+    assertThat(property.scope(), is(scope));
+    assertThat(property.value(), is(value));
   }
 }

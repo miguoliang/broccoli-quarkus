@@ -13,8 +13,8 @@ import lombok.Getter;
 public class ErrorResponse {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String errorId;
-  private List<ErrorMessage> errors;
+  private final String errorId;
+  private final List<ErrorMessage> errors;
 
   public ErrorResponse(String errorId, ErrorMessage errorMessage) {
     this.errorId = errorId;
@@ -34,8 +34,8 @@ public class ErrorResponse {
   public static class ErrorMessage {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String path;
-    private String message;
+    private final String path;
+    private final String message;
 
     public ErrorMessage(String path, String message) {
       this.path = path;

@@ -19,10 +19,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+/**
+ * Test for multi-tenant schema switch.
+ */
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @QuarkusTestResource(H2DatabaseTestResource.class)
-public class MultiTenantSchemaSwitchTest {
+class MultiTenantSchemaSwitchTest {
 
   @Inject
   MultiTenantSchemaService multiTenantSchemaService;

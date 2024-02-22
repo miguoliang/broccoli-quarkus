@@ -1,13 +1,16 @@
 package broccoli.persistence;
 
-import io.quarkus.arc.Unremovable;
+import io.quarkus.hibernate.orm.PersistenceUnitExtension;
 import io.quarkus.hibernate.orm.runtime.tenant.TenantResolver;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
-@Unremovable
+/**
+ * Custom tenant resolver that resolves the tenant based on the path.
+ */
 @RequestScoped
+@PersistenceUnitExtension
 public class MultiTenantResolver implements TenantResolver {
 
   private final RoutingContext context;
@@ -24,7 +27,7 @@ public class MultiTenantResolver implements TenantResolver {
 
   @Override
   public String resolveTenantId() {
-    // OIDC TenantResolver has already calculated the tenant id and saved it as a RoutingContext `tenantId` attribute:
-    return context.request().getHeader("X-Tenant-Id");
+    final var tenantId = context.request().getHeader("X-Tenant-Id");
+    return tenantId != null ? tenantId : getDefaultTenantId();
   }
 }

@@ -3,24 +3,32 @@ package broccoli;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
-import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
-import broccoli.common.ResourceTest;
+import broccoli.persistence.MultiTenantSchemaService;
 import broccoli.resource.EdgeResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
 @TestHTTPEndpoint(EdgeResource.class)
-class EdgeResourceQueryTest extends ResourceTest {
+class EdgeResourceQueryTest {
 
   @Inject
-  JvmResourceService resourceService;
+  ResourceService resourceService;
+
+  @Inject
+  MultiTenantSchemaService multiTenantSchemaService;
+
+  @BeforeEach
+  void setUp() {
+    multiTenantSchemaService.createSchema("default");
+  }
 
   @Test
   void shouldReturnBadRequest_WithoutParameters() {
@@ -36,12 +44,12 @@ class EdgeResourceQueryTest extends ResourceTest {
   void shouldReturnOk_WithValidParameters(TestInfo testInfo) throws NoSuchAlgorithmException {
 
     final var inVertex =
-        getResourceService().createVertex(testInfo.getDisplayName() + "in", "type");
+        resourceService.createVertex(testInfo.getDisplayName() + "in", "type");
     final var outVertex =
-        getResourceService().createVertex(testInfo.getDisplayName() + "out", "type");
+        resourceService.createVertex(testInfo.getDisplayName() + "out", "type");
     final var name = "associated";
     final var scope = "default";
-    getResourceService().createEdge(inVertex.getId(), outVertex.getId(), name, scope);
+    resourceService.createEdge(inVertex.getId(), outVertex.getId(), name, scope);
 
     final var params = String.format("?vid=%s&vid=%s&name=%s&scope=%s",
         inVertex.getId(), outVertex.getId(), name, scope);
@@ -64,10 +72,5 @@ class EdgeResourceQueryTest extends ResourceTest {
         .body("pageSize", is(20))
         .body("pageNumber", is(0))
         .statusCode(Response.Status.OK.getStatusCode());
-  }
-
-  @Override
-  protected ResourceService getResourceService() {
-    return resourceService;
   }
 }

@@ -5,6 +5,7 @@ import broccoli.common.Pageable;
 import broccoli.dto.request.CreateVertexRequest;
 import broccoli.dto.request.SetVertexPropertyRequest;
 import broccoli.dto.response.CreateVertexResponse;
+import broccoli.dto.response.QueryVertexPropertyResponse;
 import broccoli.dto.response.QueryVertexResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -78,7 +79,7 @@ public interface VertexClient {
    */
   @DELETE
   @Path("/{id}")
-  void deleteVertex(@PathParam("id") @NotBlank String id);
+  Response deleteVertex(@PathParam("id") @NotBlank String id);
 
   /**
    * Set a property to a vertex.
@@ -90,4 +91,19 @@ public interface VertexClient {
   @Path("/{id}/property")
   void setProperty(@PathParam("id") @NotBlank String id,
                    @Valid SetVertexPropertyRequest request);
+
+  /**
+   * Get a property of a vertex.
+   *
+   * @param id    vertex id
+   * @param scope scope
+   * @param key   key
+   * @return Page of QueryVertexResponse
+   */
+  @GET
+  @Path("/{id}/property")
+  Page<QueryVertexPropertyResponse> getProperties(@PathParam("id") @NotBlank String id,
+                                                  @QueryParam("scope") String scope,
+                                                  @QueryParam("key") String key,
+                                                  @BeanParam Pageable pageable);
 }

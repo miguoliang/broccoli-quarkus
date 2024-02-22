@@ -4,12 +4,9 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 
-import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
-import broccoli.common.ResourceTest;
 import broccoli.persistence.entity.Vertex;
 import broccoli.resource.VertexResource;
-import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -21,10 +18,10 @@ import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
 @TestHTTPEndpoint(VertexResource.class)
-class VertexResourceQueryTest extends ResourceTest {
+class VertexResourceQueryTest {
 
   @Inject
-  JvmResourceService resourceService;
+  ResourceService resourceService;
 
   @Test
   void getById_ShouldReturnFound(TestInfo testInfo) throws NoSuchAlgorithmException {
@@ -32,7 +29,7 @@ class VertexResourceQueryTest extends ResourceTest {
     final var name = testInfo.getDisplayName();
     final var type = "type";
     final var id = Vertex.getId(name, type);
-    getResourceService().createVertex(name, type);
+    resourceService.createVertex(name, type);
 
     given()
         .when().get("/" + id)
@@ -55,15 +52,11 @@ class VertexResourceQueryTest extends ResourceTest {
   @Test
   void query_ShouldReturnFoundWithoutParameters(TestInfo testInfo) {
 
-    QuarkusTransaction.requiringNew().run(() -> IntStream.range(0, 50).forEach(i -> {
-      try {
-        final var name = testInfo.getDisplayName() + i;
-        final var type = "type";
-        getResourceService().createVertex(name, type);
-      } catch (Exception e) {
-        assert false;
-      }
-    }));
+    IntStream.range(0, 50).forEach(i -> {
+      final var name = testInfo.getDisplayName() + i;
+      final var type = "type";
+      resourceService.createVertex(name, type);
+    });
 
     given()
         .when()
@@ -78,11 +71,11 @@ class VertexResourceQueryTest extends ResourceTest {
   }
 
   @Test
-  void query_ShouldReturnFoundWithQ(TestInfo testInfo) throws NoSuchAlgorithmException {
+  void query_ShouldReturnFoundWithQ(TestInfo testInfo) {
 
     final var name = testInfo.getDisplayName();
     final var type = "type";
-    getResourceService().createVertex(name, type);
+    resourceService.createVertex(name, type);
 
     given()
         .when().get("?q=" + name)
@@ -93,10 +86,5 @@ class VertexResourceQueryTest extends ResourceTest {
         .body("totalPages", is(1))
         .body("pageNumber", is(0))
         .body("pageSize", is(20));
-  }
-
-  @Override
-  protected ResourceService getResourceService() {
-    return resourceService;
   }
 }

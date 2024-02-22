@@ -3,17 +3,13 @@ package broccoli;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.notNullValue;
 
-import broccoli.common.JvmResourceService;
 import broccoli.common.ResourceService;
-import broccoli.common.ResourceTest;
 import broccoli.dto.request.CreateVertexRequest;
 import broccoli.persistence.MultiTenantSchemaService;
 import broccoli.persistence.entity.Vertex;
 import broccoli.resource.VertexResource;
-import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.h2.H2DatabaseTestResource;
@@ -22,9 +18,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -32,13 +25,13 @@ import org.junit.jupiter.api.TestInfo;
 @QuarkusTest
 @TestHTTPEndpoint(VertexResource.class)
 @QuarkusTestResource(H2DatabaseTestResource.class)
-class VertexResourceCreationTest extends ResourceTest {
+class VertexResourceCreationTest {
 
   @Inject
   MultiTenantSchemaService multiTenantSchemaService;
 
   @Inject
-  JvmResourceService resourceService;
+  ResourceService resourceService;
 
   @BeforeEach
   void setUp() {
@@ -60,30 +53,22 @@ class VertexResourceCreationTest extends ResourceTest {
         .post()
         .then()
         .statusCode(Response.Status.CREATED.getStatusCode())
-        .body("id", is(id));
+        .body("id", is(id))
+        .body("name", is(name))
+        .body("type", is(type));
 
-    final var vertex = getResourceService().getVertex(name, type);
+    final var vertex = resourceService.getVertex(name, type);
     assertThat(vertex, notNullValue());
-    assertThat(vertex.getId(), is(id));
-    assertThat(vertex.getName(), is(name));
-    assertThat(vertex.getType(), is(type));
-    assertThat(vertex.getVersion(), is(0));
-    assertThat(vertex.getGeneralColumns().getDateCreated(), lessThanOrEqualTo(LocalDateTime.now()));
-    assertThat(vertex.getGeneralColumns().getDateUpdated(), lessThanOrEqualTo(LocalDateTime.now()));
+    assertThat(vertex.id(), is(id));
+    assertThat(vertex.name(), is(name));
+    assertThat(vertex.type(), is(type));
   }
 
   @Test
   void shouldReturnConflict_WhenVertexAlreadyExists(TestInfo testInfo) {
     final var name = testInfo.getDisplayName();
     final var type = "test";
-
-    QuarkusTransaction.requiringNew().run(() -> {
-      try {
-        resourceService.createVertex(name, type);
-      } catch (NoSuchAlgorithmException e) {
-        throw new RuntimeException(e);
-      }
-    });
+    resourceService.createVertex(name, type);
 
     given()
         .when()
@@ -103,10 +88,5 @@ class VertexResourceCreationTest extends ResourceTest {
         .post()
         .then()
         .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
-  }
-
-  @Override
-  protected ResourceService getResourceService() {
-    return resourceService;
   }
 }

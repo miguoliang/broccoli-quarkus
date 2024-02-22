@@ -7,6 +7,7 @@ import broccoli.dto.request.CreateVertexRequest;
 import broccoli.dto.request.SetVertexPropertyRequest;
 import broccoli.dto.response.CreateVertexResponse;
 import broccoli.dto.response.GetVertexResponse;
+import broccoli.dto.response.QueryVertexPropertyResponse;
 import broccoli.dto.response.QueryVertexResponse;
 import broccoli.persistence.repository.VertexPropertyRepository;
 import broccoli.persistence.repository.VertexRepository;
@@ -17,6 +18,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -155,5 +157,31 @@ public class VertexResource {
         vertexRepository.findByIdOptional(id).orElseThrow(NotFoundException::new);
     vertexPropertyRepository.persist(request.toEntity(vertex));
     return Response.noContent().build();
+  }
+
+  /**
+   * Get properties of a vertex.
+   *
+   * @param id       vertex id
+   * @param scope    scope
+   * @param pageable pageable
+   * @return response
+   */
+  @GET
+  @Path("/{id}/property")
+  public Page<QueryVertexPropertyResponse> getProperties(@PathParam("id") @NotBlank String id,
+                                                         @QueryParam("scope")
+                                                         @DefaultValue("default") String scope,
+                                                         @BeanParam Pageable pageable) {
+    if (vertexRepository.findById(id) == null) {
+      throw new NotFoundException("Vertex not found.");
+    }
+    final var properties = vertexPropertyRepository.find("vertex.id = ?1 and scope = ?2", id, scope)
+        .page(pageable.getPage(), pageable.getSize())
+        .stream()
+        .map(QueryVertexPropertyResponse::of)
+        .toList();
+    final var total = vertexPropertyRepository.count("vertex.id = ?1 and scope = ?2", id, scope);
+    return new Page<>(properties, pageable.getPage(), pageable.getSize(), total);
   }
 }
