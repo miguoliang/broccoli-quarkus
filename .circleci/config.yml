@@ -1,13 +1,14 @@
 version: '2.1'
+
+executors:
+  openjdk-21.0.2:
+    docker:
+      - image: cimg/openjdk:21.0.2
+    resource_class: arm.medium
+
 jobs:
   build:
-    machine:
-      image: ubuntu-2004:2023.10.1
-    resource_class: arm.medium
+    executor: openjdk-21.0.2
     steps:
       - checkout
       - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
-workflows:
-  build:
-    jobs:
-      - build
