@@ -10,5 +10,6 @@ jobs:
   build:
     executor: openjdk-21
     steps:
+      - setup_remote_docker
       - checkout
       - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
