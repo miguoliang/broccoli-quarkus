@@ -12,4 +12,4 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
-      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
+      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
