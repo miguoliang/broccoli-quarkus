@@ -9,7 +9,7 @@ jobs:
     resource_class: arm.medium
     steps:
       - checkout
-      - assume_role_with_web_identity:
+      - aws-cli/assume_role_with_web_identity:
           region: us-east-1
           role_arn: arn:aws:iam::072340891755:role/github-actions-broccoli-quarkus-Role-TAQDimZKBhLP
       - run:
