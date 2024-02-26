@@ -6,7 +6,6 @@ jobs:
       image: ubuntu-2204:2023.10.1
       docker_layer_caching: true
     steps:
-      - setup_remote_docker
       - checkout
       - run: apt list --installed
 #      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
