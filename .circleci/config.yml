@@ -1,16 +1,12 @@
 version: '2.1'
 
-executors:
-  openjdk-21:
-    docker:
-      - image: cimg/openjdk:21.0.2
-    resource_class: arm.medium
-
 jobs:
   build:
-    executor: openjdk-21
+    machine:
+      image: ubuntu-2204:2023.10.1
+      docker_layer_caching: true
     steps:
       - setup_remote_docker
       - checkout
-      - run: uname -v
+      - run: apt list --installed
 #      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
