@@ -7,5 +7,12 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
-      - run: apt list --installed
+      - run:
+          name: Install OpenJDK 21
+          command: |
+            sudo apt-get update && sudo apt-get install openjdk-21-jdk
+      - run: sudo apt-get list --installed | grep openjdk
+#            sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+#            sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-amd64/bin/javac
+#            java -version
 #      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
