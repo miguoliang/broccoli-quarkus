@@ -2,13 +2,19 @@ version: '2.1'
 orbs:
   aws-cli: circleci/aws-cli@4.1.2
 jobs:
-  build_and_deploy:
+  build:
     machine:
       image: ubuntu-2204:2023.10.1
       docker_layer_caching: true
     resource_class: arm.medium
     steps:
       - checkout
+      - aws-cli/assume_role_with_web_identity:
+          region: us-east-1
+          role_arn: arn:aws:iam::072340891755:role/CircleCIWorkflow
+      - aws-cli/setup:
+          region: us-east-1
+          profile_name: default
       - run:
           name: Install OpenJDK 21
           command: |
@@ -17,12 +23,6 @@ jobs:
             sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-arm64/bin/javac
             java -version
       - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
-      - aws-cli/assume_role_with_web_identity:
-          region: us-east-1
-          role_arn: arn:aws:iam::072340891755:role/CircleCIWorkflow
-      - aws-cli/setup:
-          region: us-east-1
-          profile_name: default
       - run: |
           # Constants
           S3_BUCKET=lambda-layers-1684737774331
