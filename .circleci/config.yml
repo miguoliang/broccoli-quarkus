@@ -1,5 +1,6 @@
 version: '2.1'
-
+orbs:
+  aws-cli: circleci/aws-cli@4.1.2
 jobs:
   build:
     machine:
@@ -8,6 +9,17 @@ jobs:
     resource_class: arm.medium
     steps:
       - checkout
+      - aws-cli/setup:
+          profile_name: default
+          region: us-east-1
+      - aws-cli/role_arn_setup:
+          profile_name: new-profile
+          role_arn: arn:aws:iam::072340891755:role/github-actions-broccoli-quarkus-Role-TAQDimZKBhLP
+          source_profile: default
+      - run: >-
+          aws sts assume-role --role_arn
+          "arn:aws:iam::072340891755:role/github-actions-broccoli-quarkus-Role-TAQDimZKBhLP" --role_session_name
+          AWSCLI-Session
       - run:
           name: Install OpenJDK 21
           command: |
@@ -16,3 +28,12 @@ jobs:
             sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-arm64/bin/javac
             java -version
       - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
+      - run: |
+          # Constants
+          S3_BUCKET=lambda-layers-1684737774331
+          S3_KEY="demo-"$(date +%s)".zip"
+          LAMBDA_FUNCTION_NAME=demo
+          # Upload function.zip
+          aws s3 cp build/function.zip s3://$S3_BUCKET/$S3_KEY
+          # Update the Lambda function
+          aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --s3-bucket $S3_BUCKET --s3-key $S3_KEY
