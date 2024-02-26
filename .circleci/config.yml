@@ -12,15 +12,16 @@ jobs:
       - aws-cli/assume_role_with_web_identity:
           region: us-east-1
           role_arn: arn:aws:iam::072340891755:role/CircleCIWorkflow
-      - run:
-          name: Install OpenJDK 21
-          command: |
-            sudo apt-get update && sudo apt-get install openjdk-21-jdk
-            sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-arm64/bin/java
-            sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-arm64/bin/javac
-            java -version
-      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
+#      - run:
+#          name: Install OpenJDK 21
+#          command: |
+#            sudo apt-get update && sudo apt-get install openjdk-21-jdk
+#            sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-arm64/bin/java
+#            sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-arm64/bin/javac
+#            java -version
+#      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
       - run: |
+          aws configure list
           # Constants
           S3_BUCKET=lambda-layers-1684737774331
           S3_KEY="demo-"$(date +%s)".zip"
