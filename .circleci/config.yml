@@ -2,36 +2,33 @@ version: '2.1'
 orbs:
   aws-cli: circleci/aws-cli@4.1.2
 jobs:
-  build:
+  build_and_deploy:
     machine:
       image: ubuntu-2204:2023.10.1
       docker_layer_caching: true
     resource_class: arm.medium
     steps:
       - checkout
+      - run:
+          name: Install OpenJDK 21
+          command: |
+            sudo apt-get update && sudo apt-get install openjdk-21-jdk
+            sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-arm64/bin/java
+            sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-arm64/bin/javac
+            java -version
+      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
       - aws-cli/assume_role_with_web_identity:
           region: us-east-1
           role_arn: arn:aws:iam::072340891755:role/CircleCIWorkflow
-#      - run:
-#          name: Install OpenJDK 21
-#          command: |
-#            sudo apt-get update && sudo apt-get install openjdk-21-jdk
-#            sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-arm64/bin/java
-#            sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-arm64/bin/javac
-#            java -version
-#      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
       - aws-cli/setup:
           region: us-east-1
           profile_name: default
       - run: |
-          aws configure list
           # Constants
           S3_BUCKET=lambda-layers-1684737774331
           S3_KEY="demo-"$(date +%s)".zip"
           LAMBDA_FUNCTION_NAME=demo
-          mkdir build
-          touch build/function.zip
           # Upload function.zip
           aws s3 cp build/function.zip s3://$S3_BUCKET/$S3_KEY
           # Update the Lambda function
-#          aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --s3-bucket $S3_BUCKET --s3-key $S3_KEY
+          aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --s3-bucket $S3_BUCKET --s3-key $S3_KEY
