@@ -21,7 +21,7 @@ jobs:
 #            java -version
 #      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
       - aws-cli/setup:
-          profile-name: default
+          profile_name: default
       - run: |
           aws configure list
           # Constants
