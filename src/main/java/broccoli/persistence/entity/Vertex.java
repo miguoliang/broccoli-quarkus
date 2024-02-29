@@ -2,6 +2,7 @@ package broccoli.persistence.entity;
 
 import broccoli.common.DigestUtils;
 import broccoli.common.StringUtils;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -23,7 +24,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "vertex")
-public class Vertex {
+public class Vertex extends PanacheEntityBase {
   @Id
   @Column(name = "id", nullable = false)
   private String id;

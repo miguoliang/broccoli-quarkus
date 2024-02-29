@@ -9,9 +9,8 @@ import broccoli.dto.response.CreateVertexResponse;
 import broccoli.dto.response.GetVertexResponse;
 import broccoli.dto.response.QueryVertexPropertyResponse;
 import broccoli.dto.response.QueryVertexResponse;
-import broccoli.persistence.repository.VertexPropertyRepository;
-import broccoli.persistence.repository.VertexRepository;
-import jakarta.inject.Inject;
+import broccoli.persistence.entity.Vertex;
+import broccoli.persistence.entity.VertexProperty;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -39,23 +38,6 @@ import java.security.NoSuchAlgorithmException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class VertexResource {
 
-  private final VertexRepository vertexRepository;
-
-  private final VertexPropertyRepository vertexPropertyRepository;
-
-  /**
-   * Bean constructor.
-   *
-   * @param vertexRepository         vertex repository
-   * @param vertexPropertyRepository vertex property repository
-   */
-  @Inject
-  public VertexResource(VertexRepository vertexRepository,
-                        VertexPropertyRepository vertexPropertyRepository) {
-    this.vertexRepository = vertexRepository;
-    this.vertexPropertyRepository = vertexPropertyRepository;
-  }
-
   /**
    * Create a vertex.
    *
@@ -67,10 +49,10 @@ public class VertexResource {
   @Transactional
   public Response createVertex(@Valid CreateVertexRequest request) throws NoSuchAlgorithmException {
     final var vertex = request.toEntity();
-    if (vertexRepository.findById(vertex.getId()) != null) {
+    if (Vertex.findById(vertex.getId()) != null) {
       return Response.status(Response.Status.CONFLICT).build();
     }
-    vertexRepository.persist(vertex);
+    Vertex.persist(vertex);
     return Response.created(URI.create("/vertex/" + vertex.getId()))
         .entity(CreateVertexResponse.of(vertex)).build();
   }
@@ -84,7 +66,7 @@ public class VertexResource {
   @GET
   @Path("/{id}")
   public GetVertexResponse getVertex(@PathParam("id") @NotBlank String id) {
-    final var vertex = vertexRepository.findById(id);
+    final var vertex = Vertex.<Vertex>findById(id);
     if (vertex == null) {
       throw new NotFoundException();
     }
@@ -105,25 +87,25 @@ public class VertexResource {
     final var size = pageable.getSize();
 
     if (StringUtils.isBlank(q)) {
-      final var content = vertexRepository
-          .findAll()
+      final var content = Vertex
+          .<Vertex>findAll()
           .page(index, size)
           .stream()
           .map(QueryVertexResponse::of)
           .toList();
-      final var count = vertexRepository.count();
+      final var count = Vertex.count();
       return new Page<>(content, index, size, count);
     }
 
     final var query = "name like ?1";
     final var pattern = StringUtils.join("%", q, "%");
-    final var content = vertexRepository
-        .find(query, pattern)
+    final var content = Vertex
+        .<Vertex>find(query, pattern)
         .page(index, size)
         .stream()
         .map(QueryVertexResponse::of)
         .toList();
-    final var count = vertexRepository.count(query, pattern);
+    final var count = Vertex.count(query, pattern);
     return new Page<>(content, index, size, count);
   }
 
@@ -137,7 +119,7 @@ public class VertexResource {
   @Path("/{id}")
   @Transactional
   public Response deleteVertex(@PathParam("id") @NotBlank String id) {
-    vertexRepository.findByIdOptional(id).ifPresent(vertexRepository::delete);
+    Vertex.<Vertex>findByIdOptional(id).ifPresent(Vertex::delete);
     return Response.noContent().build();
   }
 
@@ -153,9 +135,11 @@ public class VertexResource {
   @Transactional
   public Response setProperty(@PathParam("id") @NotBlank String id,
                               @Valid SetVertexPropertyRequest request) {
-    final var vertex =
-        vertexRepository.findByIdOptional(id).orElseThrow(NotFoundException::new);
-    vertexPropertyRepository.persist(request.toEntity(vertex));
+    final var vertex = Vertex.<Vertex>findById(id);
+    if (vertex == null) {
+      throw new NotFoundException("Vertex not found.");
+    }
+    Vertex.persist(request.toEntity(vertex));
     return Response.noContent().build();
   }
 
@@ -173,15 +157,16 @@ public class VertexResource {
                                                          @QueryParam("scope")
                                                          @DefaultValue("default") String scope,
                                                          @BeanParam Pageable pageable) {
-    if (vertexRepository.findById(id) == null) {
+    if (Vertex.findById(id) == null) {
       throw new NotFoundException("Vertex not found.");
     }
-    final var properties = vertexPropertyRepository.find("vertex.id = ?1 and scope = ?2", id, scope)
+    final var properties = VertexProperty
+        .<VertexProperty>find("vertex.id = ?1 and scope = ?2", id, scope)
         .page(pageable.getPage(), pageable.getSize())
         .stream()
         .map(QueryVertexPropertyResponse::of)
         .toList();
-    final var total = vertexPropertyRepository.count("vertex.id = ?1 and scope = ?2", id, scope);
+    final var total = VertexProperty.count("vertex.id = ?1 and scope = ?2", id, scope);
     return new Page<>(properties, pageable.getPage(), pageable.getSize(), total);
   }
 }

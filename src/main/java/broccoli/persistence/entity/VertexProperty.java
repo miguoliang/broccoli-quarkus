@@ -1,14 +1,7 @@
 package broccoli.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Version;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,20 +11,18 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@IdClass(VertexPropertyId.class)
-@Table(name = "vertex_property")
-public class VertexProperty {
+@Table(name = "vertex_property", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"vertex_id", "scope", "property_key"})
+})
+public class VertexProperty extends PanacheEntity {
 
-  @Id
   @ManyToOne(optional = false)
   @JoinColumn(name = "vertex_id")
   private Vertex vertex;
 
-  @Id
   @Column(name = "scope", nullable = false)
   private String scope = "default";
 
-  @Id
   @Column(name = "property_key", nullable = false)
   private String key;
 

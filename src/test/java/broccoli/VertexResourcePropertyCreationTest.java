@@ -26,6 +26,27 @@ class VertexResourcePropertyCreationTest {
   ResourceService resourceService;
 
   @Test
+  void shouldFailToSavePropertyValue_IfVertexDoesNotExist(TestInfo testInfo)
+      throws NoSuchAlgorithmException {
+
+    final var name = testInfo.getDisplayName();
+    final var type = "test";
+    final var id = Vertex.getId(name, type);
+
+    final var scope = "default";
+    final var key = "key";
+    final var value = "value";
+
+    given()
+        .when()
+        .body(new SetVertexPropertyRequest(scope, key, value))
+        .contentType(MediaType.APPLICATION_JSON)
+        .post("/" + id + "/property")
+        .then()
+        .statusCode(Response.Status.NOT_FOUND.getStatusCode());
+  }
+
+  @Test
   void shouldSavePropertyValue_IfPropertyDoesNotExist(TestInfo testInfo)
       throws NoSuchAlgorithmException {
 

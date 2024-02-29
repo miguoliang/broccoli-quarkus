@@ -5,9 +5,7 @@ import broccoli.common.Pageable;
 import broccoli.dto.request.CreateEdgeRequest;
 import broccoli.dto.response.QueryEdgeResponse;
 import broccoli.persistence.entity.Edge;
-import broccoli.persistence.repository.EdgeRepository;
-import broccoli.persistence.repository.VertexRepository;
-import jakarta.inject.Inject;
+import broccoli.persistence.entity.Vertex;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.BeanParam;
@@ -30,22 +28,6 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class EdgeResource {
 
-  private final EdgeRepository edgeRepository;
-
-  private final VertexRepository vertexRepository;
-
-  /**
-   * Bean constructor.
-   *
-   * @param edgeRepository   The edge repository.
-   * @param vertexRepository The vertex repository.
-   */
-  @Inject
-  public EdgeResource(EdgeRepository edgeRepository, VertexRepository vertexRepository) {
-    this.edgeRepository = edgeRepository;
-    this.vertexRepository = vertexRepository;
-  }
-
   /**
    * Search edges.
    *
@@ -64,13 +46,13 @@ public class EdgeResource {
     final var index = pageable.getPage();
     final var size = pageable.getSize();
     final var query = "name in ?2 and scope in ?3 and inVertex.id in ?1 or outVertex.id in ?1";
-    final var content = edgeRepository
-        .find(query, vid, name, scope)
+    final var content = Edge
+        .<Edge>find(query, vid, name, scope)
         .page(index, size)
         .stream()
         .map(QueryEdgeResponse::of)
         .toList();
-    final var count = edgeRepository.count(query, vid, name, scope);
+    final var count = Edge.count(query, vid, name, scope);
     return new Page<>(content, index, size, count);
   }
 
@@ -84,12 +66,12 @@ public class EdgeResource {
   @Transactional
   public Response createEdge(CreateEdgeRequest request) {
 
-    final var inVertex = vertexRepository.findByIdOptional(request.inVertexId())
+    final var inVertex = Vertex.<Vertex>findByIdOptional(request.inVertexId())
         .orElseThrow(() -> new NotFoundException("Incoming vertex not found"));
-    final var outVertex = vertexRepository.findByIdOptional(request.outVertexId())
+    final var outVertex = Vertex.<Vertex>findByIdOptional(request.outVertexId())
         .orElseThrow(() -> new NotFoundException("Outgoing vertex not found"));
 
-    if (edgeRepository
+    if (Edge
         .find("inVertex.id = ?1 and outVertex.id = ?2 and name = ?3 and scope = ?4",
             inVertex.getId(), outVertex.getId(), request.name(), request.scope())
         .firstResult() != null) {
@@ -101,7 +83,7 @@ public class EdgeResource {
     edge.setOutVertex(outVertex);
     edge.setName(request.name());
     edge.setScope(request.scope());
-    edgeRepository.persist(edge);
+    Edge.persist(edge);
     return Response.noContent().build();
   }
 }

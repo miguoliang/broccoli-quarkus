@@ -1,14 +1,7 @@
 package broccoli.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Version;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,25 +11,22 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "edge")
-@IdClass(EdgeId.class)
-public class Edge {
+@Table(name = "edge", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"in_vertex_id", "out_vertex_id", "name", "scope"})
+})
+public class Edge extends PanacheEntity {
 
-  @Id
   @ManyToOne(optional = false)
   @JoinColumn(name = "in_vertex_id")
   private Vertex inVertex;
 
-  @Id
   @ManyToOne(optional = false)
   @JoinColumn(name = "out_vertex_id")
   private Vertex outVertex;
 
-  @Id
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Id
   @Column(name = "scope", nullable = false)
   private String scope = "default";
 
