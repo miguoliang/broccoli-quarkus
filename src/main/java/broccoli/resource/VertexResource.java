@@ -36,6 +36,7 @@ import java.security.NoSuchAlgorithmException;
 @Path("/vertex")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@SuppressWarnings("java:S3252")
 public class VertexResource {
 
   /**

@@ -26,6 +26,7 @@ import java.util.Set;
 @Path("/edge")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@SuppressWarnings("java:S3252")
 public class EdgeResource {
 
   /**
