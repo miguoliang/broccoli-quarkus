@@ -22,7 +22,8 @@ jobs:
             sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-arm64/bin/java
             sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-arm64/bin/javac
             java -version
-      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true --stacktrace
+      - run: ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
+      - run: ./gradlew sonar --info
       - run: |
           # Constants
           S3_BUCKET=lambda-layers-1684737774331
