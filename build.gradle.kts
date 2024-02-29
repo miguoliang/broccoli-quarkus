@@ -65,10 +65,6 @@ sonar {
         property("sonar.projectKey", "miguoliang_broccoli-quarkus")
         property("sonar.organization", "miguoliang")
         property("sonar.host.url", "https://sonarcloud.io")
-//        property("sonar.projectBaseDir", layout.projectDirectory.asFile.absolutePath)
-//        property("sonar.java.binaries", layout.buildDirectory.dir("classes").get().asFile.absolutePath)
-//        property("sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath)
-//        property("sonar.sources", layout.projectDirectory.dir("src/main").asFile.absolutePath)
-//        property("sonar.tests", layout.projectDirectory.dir("src/test").asFile.absolutePath)
+        property("sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.file("jacoco-report/jacoco.xml").get().asFile.absolutePath)
     }
 }
