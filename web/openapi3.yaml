@@ -1,0 +1,357 @@
+---
+openapi: 3.0.3
+info:
+  title: Example API (development)
+  description: Just an example service
+  termsOfService: Your terms here
+  contact:
+    name: Example API Support
+    url: https://exampleurl.com/contact
+    email: techsupport@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+paths:
+  /edge:
+    get:
+      tags:
+        - Edge Resource
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            minItems: 1
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+        - name: page
+          in: query
+          schema:
+            format: int32
+            minimum: 0
+            type: integer
+        - name: scope
+          in: query
+          required: true
+          schema:
+            minItems: 1
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+        - name: size
+          in: query
+          schema:
+            format: int32
+            maximum: 100
+            minimum: 1
+            type: integer
+        - name: vid
+          in: query
+          required: true
+          schema:
+            minItems: 1
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageQueryEdgeResponse'
+    post:
+      tags:
+        - Edge Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEdgeRequest'
+      responses:
+        "200":
+          description: OK
+  /vertex:
+    get:
+      tags:
+        - Vertex Resource
+      parameters:
+        - name: page
+          in: query
+          schema:
+            format: int32
+            minimum: 0
+            type: integer
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: size
+          in: query
+          schema:
+            format: int32
+            maximum: 100
+            minimum: 1
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageQueryVertexResponse'
+    post:
+      tags:
+        - Vertex Resource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVertexRequest'
+      responses:
+        "200":
+          description: OK
+  /vertex/{id}:
+    get:
+      tags:
+        - Vertex Resource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: \S
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVertexResponse'
+    delete:
+      tags:
+        - Vertex Resource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: \S
+            type: string
+      responses:
+        "200":
+          description: OK
+  /vertex/{id}/property:
+    get:
+      tags:
+        - Vertex Resource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: \S
+            type: string
+        - name: page
+          in: query
+          schema:
+            format: int32
+            minimum: 0
+            type: integer
+        - name: scope
+          in: query
+          schema:
+            default: default
+            type: string
+        - name: size
+          in: query
+          schema:
+            format: int32
+            maximum: 100
+            minimum: 1
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageQueryVertexPropertyResponse'
+    post:
+      tags:
+        - Vertex Resource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: \S
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetVertexPropertyRequest'
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    CreateEdgeRequest:
+      required:
+        - inVertexId
+        - outVertexId
+        - name
+        - scope
+      type: object
+      properties:
+        inVertexId:
+          pattern: \S
+          type: string
+        outVertexId:
+          pattern: \S
+          type: string
+        name:
+          pattern: \S
+          type: string
+        scope:
+          pattern: \S
+          type: string
+    CreateVertexRequest:
+      required:
+        - name
+        - type
+      type: object
+      properties:
+        name:
+          pattern: \S
+          type: string
+        type:
+          pattern: \S
+          type: string
+    GetVertexResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+    PageQueryEdgeResponse:
+      type: object
+      properties:
+        pageNumber:
+          format: int32
+          type: integer
+        pageSize:
+          format: int32
+          type: integer
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueryEdgeResponse'
+    PageQueryVertexPropertyResponse:
+      type: object
+      properties:
+        pageNumber:
+          format: int32
+          type: integer
+        pageSize:
+          format: int32
+          type: integer
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueryVertexPropertyResponse'
+    PageQueryVertexResponse:
+      type: object
+      properties:
+        pageNumber:
+          format: int32
+          type: integer
+        pageSize:
+          format: int32
+          type: integer
+        totalElements:
+          format: int64
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueryVertexResponse'
+    QueryEdgeResponse:
+      type: object
+      properties:
+        inVertexId:
+          type: string
+        inVertexName:
+          type: string
+        inVertexType:
+          type: string
+        outVertexId:
+          type: string
+        outVertexName:
+          type: string
+        outVertexType:
+          type: string
+        name:
+          type: string
+        scope:
+          type: string
+    QueryVertexPropertyResponse:
+      type: object
+      properties:
+        vertexId:
+          type: string
+        scope:
+          type: string
+        key:
+          type: string
+        value:
+          type: string
+    QueryVertexResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+    SetVertexPropertyRequest:
+      required:
+        - scope
+        - key
+        - value
+      type: object
+      properties:
+        scope:
+          pattern: \S
+          type: string
+        key:
+          pattern: \S
+          type: string
+        value:
+          type: string
