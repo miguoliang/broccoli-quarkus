@@ -22,7 +22,7 @@ public class MultiTenantResolver implements TenantResolver {
 
   @Override
   public String getDefaultTenantId() {
-    return "default";
+    return "PUBLIC";
   }
 
   @Override
