@@ -4,13 +4,11 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
 import broccoli.common.ResourceService;
-import broccoli.persistence.MultiTenantSchemaService;
 import broccoli.resource.EdgeResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
@@ -20,14 +18,6 @@ class EdgeResourceQueryTest {
 
   @Inject
   ResourceService resourceService;
-
-  @Inject
-  MultiTenantSchemaService multiTenantSchemaService;
-
-  @BeforeEach
-  void setUp() {
-    multiTenantSchemaService.createSchema("default");
-  }
 
   @Test
   void shouldReturnBadRequest_WithoutParameters() {

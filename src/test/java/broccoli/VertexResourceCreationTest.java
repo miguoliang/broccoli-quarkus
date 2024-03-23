@@ -7,36 +7,23 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import broccoli.common.ResourceService;
 import broccoli.dto.request.CreateVertexRequest;
-import broccoli.persistence.MultiTenantSchemaService;
 import broccoli.persistence.entity.Vertex;
 import broccoli.resource.VertexResource;
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 @QuarkusTest
 @TestHTTPEndpoint(VertexResource.class)
-@QuarkusTestResource(H2DatabaseTestResource.class)
 class VertexResourceCreationTest {
 
   @Inject
-  MultiTenantSchemaService multiTenantSchemaService;
-
-  @Inject
   ResourceService resourceService;
-
-  @BeforeEach
-  void setUp() {
-    multiTenantSchemaService.createSchema("default");
-  }
 
   @Test
   void shouldReturnCreated_WhenVertexDoesNotExist(TestInfo testInfo)
