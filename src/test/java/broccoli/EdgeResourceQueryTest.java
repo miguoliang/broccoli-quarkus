@@ -10,7 +10,6 @@ import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
-import java.security.NoSuchAlgorithmException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -41,7 +40,7 @@ class EdgeResourceQueryTest {
   }
 
   @Test
-  void shouldReturnOk_WithValidParameters(TestInfo testInfo) throws NoSuchAlgorithmException {
+  void shouldReturnOk_WithValidParameters(TestInfo testInfo) {
 
     final var inVertex =
         resourceService.createVertex(testInfo.getDisplayName() + "in", "type");

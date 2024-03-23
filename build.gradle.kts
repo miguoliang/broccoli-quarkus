@@ -30,6 +30,7 @@ dependencies {
     implementation("io.quarkus:quarkus-jdbc-h2")
     implementation("io.quarkus:quarkus-resteasy-reactive")
     implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
+    implementation("io.quarkus:quarkus-smallrye-openapi")
 
     testImplementation("io.quarkus:quarkus-jacoco")
     testImplementation("io.quarkus:quarkus-junit5")
@@ -57,7 +58,6 @@ tasks.withType<JavaCompile> {
 
 extensions.getByType(CheckstyleExtension::class.java).apply {
     toolVersion = "10.12.5"
-    enableExternalDtdLoad = true
 }
 
 sonar {

@@ -12,7 +12,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.security.NoSuchAlgorithmException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -33,8 +32,7 @@ class EdgeResourceCreationTest {
   }
 
   @Test
-  void shouldReturnCreated_WhenEdgeDoesNotExists(TestInfo testInfo)
-      throws NoSuchAlgorithmException {
+  void shouldReturnCreated_WhenEdgeDoesNotExists(TestInfo testInfo) {
 
     final var inVertex =
         resourceService.createVertex(testInfo.getDisplayName() + "in", "test");
@@ -54,8 +52,7 @@ class EdgeResourceCreationTest {
   }
 
   @Test
-  void shouldReturnConflict_WhenEdgeAlreadyExists(TestInfo testInfo)
-      throws NoSuchAlgorithmException {
+  void shouldReturnConflict_WhenEdgeAlreadyExists(TestInfo testInfo) {
 
     final var inVertex =
         resourceService.createVertex(testInfo.getDisplayName() + "in", "test");
@@ -76,8 +73,7 @@ class EdgeResourceCreationTest {
   }
 
   @Test
-  void shouldReturnNotFound_WhenAnyVertexDoesNotExist(TestInfo testInfo)
-      throws NoSuchAlgorithmException {
+  void shouldReturnNotFound_WhenAnyVertexDoesNotExist(TestInfo testInfo) {
 
     final var inVertex =
         resourceService.createVertex(testInfo.getDisplayName() + "in", "test");
